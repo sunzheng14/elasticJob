@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:reg="http://www.dangdang.com/schema/ddframe/reg"
+       xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://www.dangdang.com/schema/ddframe/reg
+                        http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+                        http://www.dangdang.com/schema/ddframe/job
+                        http://www.dangdang.com/schema/ddframe/job/job.xsd
+                        ">
+    <!--配置作业注册中心 -->
+    <!-- # base-sleep-time-milliseconds等待重试的间隔时间的初始值 默认1000，单位：毫秒
+         # max-sleep-time-milliseconds等待重试的间隔时间的最大值 默认3000，单位：毫秒
+    -->
+    <reg:zookeeper id="regCenter"
+                   server-lists="localhost:2181"
+                   namespace="elasticJob"
+                   base-sleep-time-milliseconds="1000"
+                   max-sleep-time-milliseconds="3000"
+                   max-retries="3" />
+
+    <!-- 配置作业 sharding-total-count:分片数量-->
+    <!--<job:simple id="jobA"-->
+                <!--class="com.sun.zq.JobA"-->
+                <!--registry-center-ref="regCenter"-->
+                <!--cron="0/10 * * * * ?"-->
+                <!--sharding-total-count="1"-->
+                <!--sharding-item-parameters="0=A,1=B,2=C"-->
+                <!--event-trace-rdb-data-source="dataSource"/>-->
+    <!--
+        # 是否开启任务执行失效转移，开启表示如果作业在一次任务执行中途宕机，允许将该次未完成的任务在另一作业节点上补偿执行, 默认为false
+    -->
+    <job:simple id="jobB"
+                class="com.sun.zq.JobB"
+                registry-center-ref="regCenter"
+                cron="0/10 * * * * ?"
+                sharding-total-count="1"
+                sharding-item-parameters="0=A"
+                failover="true"
+                description="这是jobB"
+                event-trace-rdb-data-source="dataSource"
+
+               />
+
+</beans>
